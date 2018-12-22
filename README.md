@@ -1,10 +1,10 @@
-# Get-started with AWS AppSync
+# Build a Photo Album Severless Application Using AWS AppSync
 
 AWS AppSync is a GraphQL-based serverless backend for mobile, web and enterprise applications. In this tutorial, you will use the following tools to build a photo album web application using AWS AppSync. 
 
-Please follow our instructions to create an EC2 instance and install the following tools on it. If you prefer to install them on your own computer, please refer to the URLs below for installation and skip to [Deploy App's Backend via AWS Amplify](#deploy-app's-backend-via-aws-amplify).
+This tutorial refers to _**[the Github repository](https://github.com/gabehollombe-aws/react-graphql-amplify-blog-post) of Gabe Hollombe, AWS Software Developer & Technical Evangelist**_.
 
-This tutorial refers to the Github repository of Gabe Hollombe, AWS Software Developer & Technical Evangelist.
+Please follow our instructions to create an EC2 instance and install the following tools on it. If you prefer to install them on your own computer, please refer to the URLs below for installation and skip to [Deploy App Backend via AWS Amplify](#deploy-app-backend-via-aws-amplify).
 
 * **Node.js** - This tutorial use some JavaScript tools and packages which require Node.js (and Node Package Manager, which comes with Node.js) to be installed. For more information, please refer to https://nodejs.org/en/download/.
 
@@ -18,7 +18,7 @@ This tutorial refers to the Github repository of Gabe Hollombe, AWS Software Dev
 * [Create an EC2 Linux Instance](#create-an-ec2-linux-instance)
 * [Connect to EC2 Linux Instance](#connect-to-ec2-linux-instance)
 * [Install Required Tools](#install-required-tools)
-* [Deploy App's Backend via AWS Amplify](#deploy-app's-backend-via-aws-amplify)
+* [Deploy App Backend via AWS Amplify](#deploy-app-backend-via-aws-amplify)
 * [Clean Resources](#clean-resources)
 * [Conclusion](#conclusion)
 
@@ -104,7 +104,7 @@ This tutorial refers to the Github repository of Gabe Hollombe, AWS Software Dev
   
   ![](img/publicIP.png)
 
-### Use PuTTy to Connect to EC2 Linux Instance (Windows only)
+### Use PuTTY to Connect to EC2 Linux Instance (Windows only)
 
 * Download and install PuTTY from [here](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html). PuTTY is a free SSH client for Windows which can be used to connect to EC2 instances.
 
@@ -335,7 +335,9 @@ In this tutorial, the Linux AMI we used has installed Python 2.7 by default, but
   * Profile Name: `default`
 
 
-## Deploy App's Backend via AWS Amplify
+## Deploy App Backend via AWS Amplify
+
+### Clone App to Local
 
 * Install Git if you haven't installed yet.
 
@@ -343,13 +345,22 @@ In this tutorial, the Linux AMI we used has installed Python 2.7 by default, but
 
 * Clone App from this repositoy.
 
-      git clone REPO_URL.git
+      git clone REPO_URL.git appsync
 
-* Change directory to the project folder.
+* Change directory to the App folder.
 
-      cd PROJECT_FOLDER
+      cd appsync
 
-* Initialize AWS Amplify to this project.
+### Install Required Packages for App
+
+* Enter the following command:
+
+      sudo npm install
+
+
+### Initialize AWS Amplify
+
+* Enter the following command:
 
       amplify init
 
@@ -365,7 +376,9 @@ In this tutorial, the Linux AMI we used has installed Python 2.7 by default, but
   * Please choose the profile you want to use: `default`
   * Wait until finishing.
 
-* Add a authentication backend to this project.
+### Deploy Cognito User Pool for Authentication.
+
+* Enter the following command:
 
       amplify auth add
 
@@ -374,13 +387,15 @@ In this tutorial, the Linux AMI we used has installed Python 2.7 by default, but
   
      `Yes, use the default configuration.`
 
-* Deploy AWS Cognito on the cloud.
+* Deploy on the cloud.
 
       amplify push
 
 * Press `Enter/Return` to continue, and wait for it to finish.
 
-* Add a GraphQL API
+### Deploy AppSync (GraphQL) API
+
+* Enter the following command:
 
       amplify api add
 
@@ -391,67 +406,75 @@ In this tutorial, the Linux AMI we used has installed Python 2.7 by default, but
   * Do you have an annotated GraphQL schema? `Yes`
   * Provide your schema file path: `scripts/bootstrapping/schema.graphql`
 
-* Deploy AWS AppSync(GraphQL) API on the cloud. 
+* Deploy on the cloud.
 
       amplify push
 
-* Press `Enter/Return` to continue, and wait for it to finish
+* Press `Enter/Return` to continue.
 
-* Do you want generate code for your newly created GraphQL API? `<Both are fine>`
+* Do you want to generate code for your newly created GraphQL API? `No`
 
   If you answer `Yes`, the GraphQL operations corresponding to your API will be generated in the selected programming language.
 
-* Add S3 file storage
+* Wait for it to finish.
 
-Run: `amplify storage add`
+### Deploy S3 File Storage
 
-Answer the questions like this:
-- Please select from one of the below mentioned services `Content (Images, audio, video, etc.)`
-- Please provide a friendly name for your resource that will be used to label this category in the project: `AppSyncDemoPhotoStorage`
-- Please provide bucket name: `<accept the default value>`
-- Who should have access: `Auth users only`
-- What kind of access do you want for Authenticated users `read/write`
+* Enter the following command:
 
-Run `amplify push`, Press `Enter/Return` to continue, and wait for it to finish
+      amplify storage add
 
-### 6. Publish the app to the CloudFront CDN
-Run `amplify hosting add`
+* Answer the questions like this:
+  * Please select from one of the below mentioned services `Content (Images, audio, video, etc.)`
+  * Please provide a friendly name for your resource that will be used to label this category in the project: `AppSyncDemoPhotoStorage`
+  * Please provide bucket name: `<accept the default value>`
+  * Who should have access: `Auth users only`
+  * What kind of access do you want for Authenticated users `read/write`
 
-Answer the questions like this:
-- Select the environment setup: `PROD (S3 with CloudFront using HTTPS)`
-- hosting bucket name `<accept the default>`
-- index doc for the website `index.html`
-- error doc for the website `index.html`
+* Deploy on the cloud.
 
-Run `amplify push`, Press `Enter/Return` to continue, and wait for it to finish
+       amplify push
 
-Run `amplify publish` and wait for it to finish
+* Press `Enter/Return` to continue, and wait for it to finish
 
-### 7. Run the bootstrapping script to update some of the AWS resources for this codebase
 
-RUN: `npm install`
+### Run Bootstrap Script 
 
-Run: `npm run bootstrap` (Modify the bootstrap script in `package.json` as `bash scripts/bootstrapping/bootstrap_app.sh` first or run `bash /scripts/bootstrapping/bootstrap_app.sh` instead)
+* Enter the following command to run script:
 
-**What this script does:**
-- Runs `npm install` for the React app as well as the `photo_processor` Lambda function
-- Packages and deploys the `photo_processor` Lambda function, configuring it to trigger when new photos are uploaded to the S3 bucket used for storage configured by Amplify
-- Updates the AppSync API schema and resolvers to be in-line with what this codebase expects (so you don't need to make manual changes in the AppSync web console). 
-- Adds an explicit `Deny` on `s3:ListBucket` for the IAM role associated with authenticated users in the app
-- Re-creates a Global Secondary Index on the DynamoDB table used for the PhotoTable AppSync data source to allow fetching items in reverse chronological order
+      npm run bootstrap
 
-Notes:
-- Ths script uses credentials stored in ~/.aws/credentials (macOS/Linux) or C:\Users\USER_NAME\.aws\credentials (Windows). 
-- If you have a specific AWS credentials profile you want to use, prefix the command with AWS_PROFILE=name-of-profile
-- It requires Node.js version 8 or higher and Docker to be installed
+* (Optional) If problems occurred, try the following command:
 
-### 8. Start the app
+      bash /scripts/bootstrapping/bootstrap_app.sh
 
-Run `npm start` to start the app. Hopefully, everything should work at this point. :)
+  > **What this script does:**
+  > * Packages and deploys the `photo_processor` Lambda function, configuring it to trigger when new photos are uploaded to the S3 bucket used for storage configured by Amplify
+  > * Updates the AppSync API schema and resolvers to be in-line with what this codebase expects (so you don't need to make manual changes in the AppSync web console). 
+  > * Adds an explicit `Deny` on `s3:ListBucket` for the IAM role associated with authenticated users in the app
+  > * Re-creates a Global Secondary Index on the DynamoDB table used for the PhotoTable AppSync data source to allow fetching items in reverse chronological order
 
-### 9. Host Static Website on S3
+  > **Notes:**
+  > - Ths script uses credentials stored in ~/.aws/credentials (macOS/Linux) or C:\Users\USER_NAME\.aws\credentials (Windows). 
+  > - If you have a specific AWS credentials profile you want to use, prefix the command with AWS_PROFILE=name-of-profile
+  > - It requires Node.js version 8 or higher and Docker to be installed
 
-Run `npm run build`.
+#### Start the App
+
+* Enter the command below to start application with a lightweight web server.
+      
+      npm start
+
+* Visit the 
+
+#### (Optional) Host Static Website on S3
+
+* Build as static web application with the following command:
+
+      npm run build
+
+  > Make sure the instance type you selected has at least **2 GB** RAM. 
+
 Run `aws s3 cp build/ s3://your-bucket-name`
 
     {
@@ -471,5 +494,13 @@ Run `aws s3 cp build/ s3://your-bucket-name`
 
 # Clean Resources
 
+* Delete the stacks named with **`appsync`** prefix on [AWS CloudFormation](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks?filter=active).
+* Delete created S3 bucket which hosts a static website.
+* Delete the secret creadential of created IAM user.
+
 # Conclusion
 
+You have learned:
+* Use Amplify to deploy authentication.
+* Use Amplify to deploy AppSync API.
+* Use Amplify to deploy S3 storage bucket.

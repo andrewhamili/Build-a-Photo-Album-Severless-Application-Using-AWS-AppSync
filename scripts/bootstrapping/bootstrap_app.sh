@@ -8,7 +8,7 @@ pushd $DIR
 
 # Install npm deps for app
 pushd ../../
-npm install
+sudo npm install
 popd
 
 # Install npm deps for photo_processor lambda
