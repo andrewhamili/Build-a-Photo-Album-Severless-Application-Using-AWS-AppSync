@@ -345,7 +345,7 @@ In this tutorial, the Linux AMI we used has installed Python 2.7 by default, but
 
 * Clone App from this repositoy.
 
-      git clone REPO_URL.git appsync
+      git clone https://github.com/ecloudvalley/Build-a-Photo-Album-Severless-Application-Using-AWS-AppSync.git appsync
 
 * Change directory to the App folder.
 
@@ -459,15 +459,23 @@ In this tutorial, the Linux AMI we used has installed Python 2.7 by default, but
   > - If you have a specific AWS credentials profile you want to use, prefix the command with AWS_PROFILE=name-of-profile
   > - It requires Node.js version 8 or higher and Docker to be installed
 
-#### Start the App
+### Start the App
 
 * Enter the command below to start application with a lightweight web server.
       
       npm start
 
-* Visit the 
+* Visit **`http://YOUR_INSTANCE_IP:3000`**, you should be able to see the home page as below.
 
-#### (Optional) Host Static Website on S3
+  > Make sure to replace `YOUR_INSTANCE_IP` with your EC2 instance's public IP.
+
+![](img/home.png)
+
+### Host Static Website on S3
+
+#### Build as Static Web Application
+
+* Press `ctrl + C` to stop the application.
 
 * Build as static web application with the following command:
 
@@ -475,21 +483,61 @@ In this tutorial, the Linux AMI we used has installed Python 2.7 by default, but
 
   > Make sure the instance type you selected has at least **2 GB** RAM. 
 
-Run `aws s3 cp build/ s3://your-bucket-name`
+* Create a S3 bucket with a unique name via AWS CLI:
 
-    {
+      aws s3 mb s3://YOUR_BUCKET_NAME
+
+> Make sure to replace `YOUR_BUCKET_NAME` with a unique name.
+
+* Upload build files to S3 bucket.
+
+      aws s3 cp build/ s3://YOUR_BUCKET_NAME
+
+* Go to [Amazon S3 console](https://console.aws.amazon.com/s3/home).
+
+* Search and click the newly created bucket.
+
+* Select **Properties** tab.
+
+* Click **Static website hosting**.
+
+* Select **Use this bucket to host a website**.
+
+* Type **index.html** for the index document, then click **Save**.
+
+* Click **Bucket Policy** tab in **Permissions** tab.
+> When you configure a bucket as a website, you have to make the objects that you want to serve publicly readable. 
+
+* Copy the bucket policy below, and paste it into the field. 
+
+  > Make sure you have replaced **`<YOUR_BUCKET_NAME>`** with the bucket name then click **Save**.
+
+      {
       "Version": "2012-10-17",
-      "Id": "Policy1545029983437",
       "Statement": [
-        {
-          "Sid": "Stmt1545029772724",
-          "Effect": "Allow",
-          "Principal": "*",
-          "Action": "s3:GetObject",
-          "Resource": "arn:aws:s3:::appsync-demo.ecloudvalley.com/*"
-        }
+            {
+                  "Sid": "PublicReadGetObject",
+                  "Effect": "Allow",
+                  "Principal": "*",
+                  "Action": [
+                  "s3:GetObject"
+                  ],
+                  "Resource": [
+                  "arn:aws:s3:::<YOUR_BUCKET_NAME>/*"
+                  ]
+            }
       ]
-    }
+      }
+
+* Select **Properties** tab.
+
+* Click **Static website hosting**.
+
+* Visit **the URL** displays on upper side.
+
+* You should be able to see the home page.
+
+![]()
 
 
 # Clean Resources
