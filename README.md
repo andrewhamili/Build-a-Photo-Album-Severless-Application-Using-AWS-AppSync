@@ -14,6 +14,7 @@ Please follow our instructions to create an EC2 instance and install the followi
 
 ## List of Contents
 
+* [Scenario](#scenario)
 * [Pre-requisites](#pre-requisites)
 * [Create an EC2 Linux Instance](#create-an-ec2-linux-instance)
 * [Connect to EC2 Linux Instance](#connect-to-ec2-linux-instance)
@@ -21,6 +22,12 @@ Please follow our instructions to create an EC2 instance and install the followi
 * [Deploy App Backend via AWS Amplify](#deploy-app-backend-via-aws-amplify)
 * [Clean Resources](#clean-resources)
 * [Conclusion](#conclusion)
+
+## Scenario
+
+![](img/architecture.png)
+
+The photo album web application uses Amazon Cognito for user authentication. Each user need to create an account and log in first to create albums, browse albums and upload photos. The metadata of albums and photos are stored in DynamoDB tables and operated via a GraphQL API hosted by AWS AppSync while a user is creating an album, listing albums and listing photos of a album. Photos are stored in a S3 bucket and a Lambda function for generating thumbnails is triggered once a photo is uploaded.
 
 ## Pre-requisites
 
@@ -38,7 +45,7 @@ Please follow our instructions to create an EC2 instance and install the followi
 
 * For AMI, select **Amazon Linux 2 AMI (HVM), SSD Volume Type** (which its AMI ID is ami-009d6802948d06e52) with **64-bit (x86)**.
 
-圖片
+  ![](img/AMI.png)
 
 * For instance type, choose **t3.small** and click **Next: Configure Instance Details**.
 
@@ -71,8 +78,8 @@ Please follow our instructions to create an EC2 instance and install the followi
   * In **Port Range**, type **`3000`**.
 
   * In **Source**, select **Anywhere**.
-
-圖片
+  
+  ![](img/securityGroup.png)
 
 * Click **Review and Launch**.
 
@@ -298,12 +305,9 @@ In this tutorial, the Linux AMI we used has installed Python 2.7 by default, but
 
         sudo yum install gcc
 
-  * Uninstall built-in AWS Command-line Interface (AWS CLI). The old built-in version (installed via yum package manager) exists package dependency problem, therefore we unintall it.
+  * Re-install the built-in AWS Command-line Interface (AWS CLI). The old built-in version (installed via yum package manager) exists package dependency problem, therefore we re-intall it via pip (which provides latest version).
 
         sudo yum remove awscli
-        
-  * (Optional) You can re-install the latest version AWS CLI via pip.
-
         pip install awscli --upgrade --user
       
   * Install SAM via pip.
@@ -324,7 +328,7 @@ In this tutorial, the Linux AMI we used has installed Python 2.7 by default, but
 * Configure your AWS credential and follow the prompt:
 
       amplify configure
-      
+
   * Login to [AWS Management Console](https://console.aws.amazon.com/console/home?region=us-east-1), then press `Enter` to continue
   * Specify the AWS region: `us-east-1`
   * Specify the username of the new IAM user: `<anything you want>`
@@ -333,6 +337,7 @@ In this tutorial, the Linux AMI we used has installed Python 2.7 by default, but
   * accessKeyId: `<YOUR_ACCESS_KEY_ID>`
   * secretAccessKey: `<YOUR_SECRET_ACCESS_KEY>`
   * Profile Name: `default`
+  > After configuring Amplify, credential files (which also are used by AWS CLI) are generated in ~/.aws/credentials (macOS/Linux) or C:\Users\USER_NAME.aws\credentials (Windows).
 
 
 ## Deploy App Backend via AWS Amplify
@@ -469,7 +474,7 @@ In this tutorial, the Linux AMI we used has installed Python 2.7 by default, but
 
   > Make sure to replace `YOUR_INSTANCE_IP` with your EC2 instance's public IP.
 
-![](img/home.png)
+  ![](img/home.png)
 
 ### Host Static Website on S3
 
@@ -485,9 +490,9 @@ In this tutorial, the Linux AMI we used has installed Python 2.7 by default, but
 
 * Create a S3 bucket with a unique name via AWS CLI:
 
-      aws s3 mb s3://YOUR_BUCKET_NAME
+  > Make sure to replace `YOUR_BUCKET_NAME` with a unique name.
 
-> Make sure to replace `YOUR_BUCKET_NAME` with a unique name.
+      aws s3 mb s3://YOUR_BUCKET_NAME
 
 * Upload build files to S3 bucket.
 
@@ -497,18 +502,11 @@ In this tutorial, the Linux AMI we used has installed Python 2.7 by default, but
 
 * Search and click the newly created bucket.
 
-* Select **Properties** tab.
+* Click **Permissions** tab -> **Bucket Policy**.
 
-* Click **Static website hosting**.
+* Copy the bucket policy below, and paste it into the field.
 
-* Select **Use this bucket to host a website**.
-
-* Type **index.html** for the index document, then click **Save**.
-
-* Click **Bucket Policy** tab in **Permissions** tab.
-> When you configure a bucket as a website, you have to make the objects that you want to serve publicly readable. 
-
-* Copy the bucket policy below, and paste it into the field. 
+  > When you configure a bucket as a website, you have to make the objects that you want to serve publicly readable. 
 
   > Make sure you have replaced **`<YOUR_BUCKET_NAME>`** with the bucket name then click **Save**.
 
@@ -529,15 +527,23 @@ In this tutorial, the Linux AMI we used has installed Python 2.7 by default, but
       ]
       }
 
-* Select **Properties** tab.
+* Click **Properties** tab.
 
 * Click **Static website hosting**.
 
-* Visit **the URL** displays on upper side.
+* Select **Use this bucket to host a website**.
+
+* Type **index.html** for the index document, then click **Save**.
+
+* Click **Static website hosting** again.
+
+* Click **the URL** displayed on upper side.
+
+  ![](img/url.png)
 
 * You should be able to see the home page.
 
-![]()
+  ![](img/staticHome.png)
 
 
 # Clean Resources
@@ -552,3 +558,4 @@ You have learned:
 * Use Amplify to deploy authentication.
 * Use Amplify to deploy AppSync API.
 * Use Amplify to deploy S3 storage bucket.
+* Host a static website on S3.
