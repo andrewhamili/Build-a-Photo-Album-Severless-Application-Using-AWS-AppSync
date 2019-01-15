@@ -121,7 +121,7 @@ The photo album web application uses Amazon Cognito for user authentication. Eac
 
   Execute **puttygen.exe**.
 
-  > puttygen.exe should be installed together if you had installed PuTTY via official Windows Installer. If you can't find puttygen.exe, try to press **`Win + S`** (**`Win + F`** for Win 7) and type **`puttygen`** to search the execution file.
+  > puttygen.exe should be installed together if you had installed PuTTY via official Windows Installer. If you can't find puttygen.exe, try to press **`Win + S`** (**`Win + F`** for Win 7) and type **`puttygen`** to search the execution file or download it from the same link you download PuTTy.
 
 * Click **Load** button and select the **AppSyncDemo.pem** you downloaded.
 
@@ -490,13 +490,13 @@ In this tutorial, the Linux AMI we used has installed Python 2.7 by default, but
 
 * Create a S3 bucket with a unique name via AWS CLI:
 
-  > Make sure to replace `YOUR_BUCKET_NAME` with a unique name.
+  > Make sure to replace `YOUR_BUCKET_NAME` with a unique name and without capital letter or other special mark.
 
       aws s3 mb s3://YOUR_BUCKET_NAME
 
 * Upload build files to S3 bucket.
 
-      aws s3 cp build/ s3://YOUR_BUCKET_NAME
+      aws s3 cp --recursive build/ s3://YOUR_BUCKET_NAME
 
 * Go to [Amazon S3 console](https://console.aws.amazon.com/s3/home).
 
